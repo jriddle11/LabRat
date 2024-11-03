@@ -84,7 +84,7 @@ namespace LabRat
                     foreach (var otherCharacter in characters)
                     {
                         if (character.ID <= otherCharacter.ID) continue;
-                        if (character.Velocity.Y < 0) continue;
+                        if (character.Velocity.Y < 0.5f) continue;
                         if (!character.EntityCollision) continue;
                         if (character.FloorCollider.CollidesWith(otherCharacter.Collider))
                         {
@@ -216,7 +216,7 @@ namespace LabRat
         {
             if (character.FloorCollider.CollidesWith(otherCharacter.Collider))
             {
-                var top = character.FloorCollider.Bottom - otherCharacter.Collider.Top - character.FloorCollider.Radius - 1;
+                var top = character.FloorCollider.Bottom - otherCharacter.Collider.Top - character.FloorCollider.Radius - 5;
                 var bottom = otherCharacter.Collider.Bottom - character.FloorCollider.Top;
 
                 float overlapY = Math.Min(top, bottom);

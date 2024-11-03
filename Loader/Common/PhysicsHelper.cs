@@ -3,30 +3,35 @@ namespace LabRat
 {
     public static class PhysicsHelper
     {
-        public static void ResolveClonePhysics(List<Character> characters, GameTime gameTime)
+        public static void ResolveClonePhysics(List<Character> characters)
         {
             foreach (var character in characters)
             {
                 foreach (var otherCharacter in characters)
                 {
                     if (character.ID <= otherCharacter.ID) continue;
+                    if (character.Velocity.Y < 0.5f) continue;
                     if (!character.EntityCollision) continue;
+                    character.IsHeld = false;
                     if (character.FloorCollider.CollidesWith(otherCharacter.Collider) && character.IsGrounded)
                     {
-                        ApplyCloneConnection(character, otherCharacter, gameTime);
+                        ApplyCloneConnection(character, otherCharacter);
                     }
                 }
             }
         }
 
-        public static void ApplyCloneConnection(Character character, Character otherCharacter, GameTime gameTime)
+        public static void ApplyCloneConnection(Character character, Character otherCharacter)
         {
-            var top = character.FloorCollider.Bottom - otherCharacter.Collider.Top - character.FloorCollider.Radius - 1;
+            var top = character.FloorCollider.Bottom - otherCharacter.Collider.Top - character.FloorCollider.Radius;
             var bottom = otherCharacter.Collider.Bottom - character.FloorCollider.Top;
 
-            if (top < bottom)
+            if (top <= bottom)
             {
-                character.Position = new Vector2(otherCharacter.Position.X, otherCharacter.Position.Y - 64);
+                character.Position = new Vector2(otherCharacter.Position.X, otherCharacter.Position.Y - 100);
+                character.IsHeld = true;
+                character.Direction = otherCharacter.Direction;
+                character.UpdateCollider();
             }
 
         }

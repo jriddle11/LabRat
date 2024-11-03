@@ -46,8 +46,8 @@ namespace LabRat
         {
             AdjustZoom();
 
-            _position = new Vector2(position.X + 32 - (_viewport.Width / 2) / _zoom,
-                                    position.Y + 32 - (_viewport.Height / 2) / _zoom);
+            _position = new Vector2(position.X + 120 - (_viewport.Width / 2) / _zoom,
+                                    position.Y + 75 - (_viewport.Height / 2) / _zoom);
 
             _position.X = MathHelper.Clamp(_position.X, 0, Boundaries.X - (_viewport.Width / _zoom));
             _position.Y = MathHelper.Clamp(_position.Y, 0, Boundaries.Y - (_viewport.Height / _zoom));

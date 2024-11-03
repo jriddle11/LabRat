@@ -38,7 +38,7 @@ namespace LabRat
 
         public void Draw(SpriteBatch spriteBatch)
         {
-            if(Enabled) spriteBatch.DrawString(_font, _text, Position, Color);
+            if(Enabled) spriteBatch.DrawString(_font, _text, Position, Color, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0.85f);
         }
     }
 }

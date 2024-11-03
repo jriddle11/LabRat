@@ -7,58 +7,86 @@ namespace LabRat
         //Mouse
         public static bool Mouse1Down => _currentMouseState.LeftButton == ButtonState.Pressed;
         public static bool Mouse1Up => _currentMouseState.LeftButton == ButtonState.Released;
-        public static bool Mouse1JustPressed => _currentMouseState.LeftButton == ButtonState.Pressed && _priorMouseState.LeftButton == ButtonState.Released;
-        public static bool Mouse1Clicked;
+        public static bool Mouse1Clicked => _currentMouseState.LeftButton == ButtonState.Pressed && _priorMouseState.LeftButton == ButtonState.Released;
+
+        public static bool Mouse2Down => _currentMouseState.RightButton == ButtonState.Pressed;
+        public static bool Mouse2Up => _currentMouseState.RightButton == ButtonState.Released;
+        public static bool Mouse2Clicked => _currentMouseState.RightButton == ButtonState.Pressed && _priorMouseState.RightButton == ButtonState.Released;
 
         //Keyboard
-        public static bool HoldingUp;
-        public static bool HoldingDown;
-        public static bool HoldingLeft;
-        public static bool HoldingRight;
+        public static bool HoldingDown => _currentKeyboardState.IsKeyDown(Keys.S) || _currentKeyboardState.IsKeyDown(Keys.Down);
+        public static bool HoldingUp => _currentKeyboardState.IsKeyDown(Keys.W) || _currentKeyboardState.IsKeyDown(Keys.Up);
+        public static bool HoldingLeft => _currentKeyboardState.IsKeyDown(Keys.A) || _currentKeyboardState.IsKeyDown(Keys.Left);
+        public static bool HoldingRight => _currentKeyboardState.IsKeyDown(Keys.D) || _currentKeyboardState.IsKeyDown(Keys.Right);
 
-        public static bool HoldingSpace;
-        public static bool HoldingEscape;
-        public static bool HoldingZ;
-        public static bool HoldingX;
-        public static bool HoldingShift;
+        public static bool HoldingSpace => _currentKeyboardState.IsKeyDown(Keys.Space);
+        public static bool HoldingShift => _currentKeyboardState.IsKeyDown(Keys.LeftShift) || _currentKeyboardState.IsKeyDown(Keys.RightShift);
+        public static bool HoldingEscape => _currentKeyboardState.IsKeyDown(Keys.Escape);
+        public static bool HoldingZ => _currentKeyboardState.IsKeyDown(Keys.Z);
+        public static bool HoldingX => _currentKeyboardState.IsKeyDown(Keys.X);
 
         public static bool IsHolding => HoldingDown || HoldingLeft || HoldingUp || HoldingRight;
 
-        public static bool PressedDown;
-        public static bool PressedUp;
-        public static bool PressedLeft;
-        public static bool PressedRight;
+        public static bool PressedDown => HoldingDown && _priorKeyboardState.IsKeyUp(Keys.S) && _priorKeyboardState.IsKeyUp(Keys.Down);
+        public static bool PressedUp => HoldingUp && _priorKeyboardState.IsKeyUp(Keys.W) && _priorKeyboardState.IsKeyUp(Keys.Up);
+        public static bool PressedRight => HoldingRight && _priorKeyboardState.IsKeyUp(Keys.Right) && _priorKeyboardState.IsKeyUp(Keys.D);
+        public static bool PressedLeft => HoldingLeft && _priorKeyboardState.IsKeyUp(Keys.Left) && _priorKeyboardState.IsKeyUp(Keys.A);
 
-        public static bool PressedSpace;
-        public static bool PressedEscape;
-        public static bool PressedZ;
-        public static bool PressedX;
+        public static bool PressedSpace => HoldingSpace && _priorKeyboardState.IsKeyUp(Keys.Space);
+        public static bool PressedEscape => HoldingEscape && _priorKeyboardState.IsKeyUp(Keys.Escape);
+        public static bool PressedZ => HoldingZ && _priorKeyboardState.IsKeyUp(Keys.Z);
+        public static bool PressedX => HoldingX && _priorKeyboardState.IsKeyUp(Keys.X);
 
+        //States
         private static KeyboardState _priorKeyboardState;
         private static KeyboardState _currentKeyboardState;
         private static MouseState _currentMouseState;
         private static MouseState _priorMouseState;
 
+        //Recording
         private static Queue<InputTimeStamp> _inputHistory;
         public static bool Recording;
         private static float _recordCurrentTime;
-        private static bool _recordingHoldingSpace = false;
-        private static bool _recordingHoldingLeft = false;
-        private static bool _recordingHoldingRight = false;
+        private static bool _recordingPressJump = false;
+        private static bool _recordingHoldLeft = false;
+        private static bool _recordingHoldRight = false;
 
         public static void StartRecording()
         {
             _inputHistory = new();
             _recordCurrentTime = 0;
-            _inputHistory.Enqueue(new InputTimeStamp(_currentKeyboardState ,_recordCurrentTime));
+            _inputHistory.Enqueue(new InputTimeStamp(_recordCurrentTime));
             Recording = true;
         }
 
         public static Queue<InputTimeStamp> StopRecording()
         {
             Recording = false;
-            _inputHistory.Enqueue(new InputTimeStamp(_currentKeyboardState, _recordCurrentTime));
+            _inputHistory.Enqueue(new InputTimeStamp(_recordCurrentTime));
             return _inputHistory;
+        }
+
+        public static bool Holding(string keyString)
+        {
+            Enum.TryParse(keyString, true, out Keys key);
+            return _currentKeyboardState.IsKeyDown(key);
+        }
+
+        public static bool Holding(string[] keyStrings)
+        {
+            bool holding = false;
+            foreach(string keyString in keyStrings)
+            {
+                Enum.TryParse(keyString, true, out Keys key);
+                holding = holding || _currentKeyboardState.IsKeyDown(key);
+            }
+            return holding;
+        }
+
+        public static bool Pressed(string keyString)
+        {
+            Enum.TryParse(keyString, true, out Keys key);
+            return _currentKeyboardState.IsKeyDown(key) && _priorKeyboardState.IsKeyDown(key);
         }
 
         public static Direction GetKeyboardDirection()
@@ -82,16 +110,6 @@ namespace LabRat
             _priorMouseState = _currentMouseState;
             _currentMouseState = Mouse.GetState();
 
-            Mouse1Clicked = false;
-            if (_currentMouseState.LeftButton == ButtonState.Pressed && _priorMouseState.LeftButton == ButtonState.Released)
-            {
-                Mouse1Clicked = true;
-            }
-            else
-            {
-                Mouse1Clicked = false;
-            }
-
             #endregion
 
             #region Keyboard
@@ -99,38 +117,15 @@ namespace LabRat
             _priorKeyboardState = _currentKeyboardState;
             _currentKeyboardState = Keyboard.GetState();
 
-            //Holding button
-            HoldingDown = _currentKeyboardState.IsKeyDown(Keys.S) || _currentKeyboardState.IsKeyDown(Keys.Down);
-            HoldingUp = _currentKeyboardState.IsKeyDown(Keys.W) || _currentKeyboardState.IsKeyDown(Keys.Up);
-            HoldingLeft = _currentKeyboardState.IsKeyDown(Keys.A) || _currentKeyboardState.IsKeyDown(Keys.Left);
-            HoldingRight = _currentKeyboardState.IsKeyDown(Keys.D) || _currentKeyboardState.IsKeyDown(Keys.Right);
-
-            HoldingSpace = _currentKeyboardState.IsKeyDown(Keys.Space);
-            HoldingShift = _currentKeyboardState.IsKeyDown(Keys.LeftShift) || _currentKeyboardState.IsKeyDown(Keys.RightShift);
-            HoldingEscape = _currentKeyboardState.IsKeyDown(Keys.Escape);
-            HoldingZ = _currentKeyboardState.IsKeyDown(Keys.Z);
-            HoldingX = _currentKeyboardState.IsKeyDown(Keys.X);
-
-            //Pressing button
-            PressedDown = HoldingDown && _priorKeyboardState.IsKeyUp(Keys.S) && _priorKeyboardState.IsKeyUp(Keys.Down);
-            PressedUp = HoldingUp && _priorKeyboardState.IsKeyUp(Keys.W) && _priorKeyboardState.IsKeyUp(Keys.Up);
-            PressedRight = HoldingRight && _priorKeyboardState.IsKeyUp(Keys.Right) && _priorKeyboardState.IsKeyUp(Keys.D);
-            PressedLeft = HoldingLeft && _priorKeyboardState.IsKeyUp(Keys.Left) && _priorKeyboardState.IsKeyUp(Keys.A);
-
-            PressedSpace = HoldingSpace && _priorKeyboardState.IsKeyUp(Keys.Space);
-            PressedEscape = HoldingEscape && _priorKeyboardState.IsKeyUp(Keys.Escape);
-            PressedZ = HoldingZ && _priorKeyboardState.IsKeyUp(Keys.Z);
-            PressedX = HoldingX && _priorKeyboardState.IsKeyUp(Keys.X);
-
             if (Recording)
             {
                 _recordCurrentTime += (float)gameTime.ElapsedGameTime.TotalSeconds;
                 if(!RecordingInputIsTheSame())
                 {
-                    _inputHistory.Enqueue(new InputTimeStamp(_currentKeyboardState, _recordCurrentTime));
-                    _recordingHoldingLeft = _currentKeyboardState.IsKeyDown(Keys.Left);
-                    _recordingHoldingRight = _currentKeyboardState.IsKeyDown(Keys.Right);
-                    _recordingHoldingSpace = _currentKeyboardState.IsKeyDown(Keys.Z);
+                    _inputHistory.Enqueue(new InputTimeStamp(_recordCurrentTime));
+                    _recordingHoldLeft = HoldingLeft;
+                    _recordingHoldRight = HoldingRight;
+                    _recordingPressJump = PressedSpace;
                 }
             }
 
@@ -139,15 +134,24 @@ namespace LabRat
 
         public static bool IsMouseInRectangle(BoundingRectangle rectangle)
         {
-            var mouse = _currentMouseState;
-            return rectangle.Contains(new Vector2(mouse.X, mouse.Y));
+            Vector2 transformedMousePosition = GetMousePosition();
+
+            return rectangle.Contains(transformedMousePosition);
+        }
+
+        public static Vector2 GetMousePosition()
+        {
+            Vector2 mousePosition = new Vector2(_currentMouseState.X, _currentMouseState.Y);
+
+            // Transform the mouse position to world space using the inverse of the camera transform
+            return Vector2.Transform(mousePosition, Matrix.Invert(Context.Camera.Transform));
         }
 
         private static bool RecordingInputIsTheSame()
         {
-            var a = _currentKeyboardState.IsKeyDown(Keys.Left) == _recordingHoldingLeft;
-            var b = _currentKeyboardState.IsKeyDown(Keys.Right) == _recordingHoldingRight;
-            var c = _currentKeyboardState.IsKeyDown(Keys.Z) == _recordingHoldingSpace;
+            var a = HoldingLeft == _recordingHoldLeft;
+            var b = HoldingRight == _recordingHoldRight;
+            var c = PressedSpace == _recordingPressJump;
             return a && b && c;
         }
     }
@@ -155,27 +159,19 @@ namespace LabRat
     public struct InputTimeStamp
     {
         public float Time;
-        public bool HoldingRight;
-        public bool HoldingLeft;
-        public bool PressedSpace;
+        public bool HoldRight;
+        public bool HoldLeft;
+        public bool PressSpace;
 
         private static readonly InputTimeStamp noInput = new InputTimeStamp();
         public static InputTimeStamp NoInput => noInput;
 
-        public InputTimeStamp(KeyboardState state, float time)
-        {
-            Time = time;
-            HoldingRight = state.IsKeyDown(Keys.Right);
-            HoldingLeft = state.IsKeyDown(Keys.Left);
-            PressedSpace = state.IsKeyDown(Keys.Z);
-        }
-
         public InputTimeStamp(float time)
         {
             Time = time;
-            HoldingRight = false;
-            HoldingLeft = false;
-            PressedSpace = false;
+            HoldRight = InputManager.HoldingRight;
+            HoldLeft = InputManager.HoldingLeft;
+            PressSpace = InputManager.PressedSpace;
         }
     }
 }

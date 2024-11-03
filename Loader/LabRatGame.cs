@@ -10,7 +10,6 @@ namespace LabRat
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
         private MainMenu _mainMenu;
-        private Camera _camera;
         private readonly Vector2 _camOffset = new Vector2(0, -200);
         private LevelControl _levelControl;
         private List<Character> _characters = new();
@@ -26,6 +25,7 @@ namespace LabRat
 
         public LabRatGame()
         {
+            Debug.WriteLine("We have begun");
             Instance = this;
             _graphics = new GraphicsDeviceManager(this);
             _graphics.PreferredBackBufferWidth = 1600;
@@ -49,8 +49,8 @@ namespace LabRat
         {
             Context.Player.Reset();
             _playing = false;
-            _camera.Reset();
-            _camera.ForceZoom(1f);
+            Context.Camera.Reset();
+            Context.Camera.ForceZoom(1f);
             _newCharacters.Clear();
             foreach(Character c in _characters)
             {
@@ -66,8 +66,8 @@ namespace LabRat
             if (_mainMenu.LevelSelected == 0) return;
             _playing = true;
             _levelControl.LoadLevel(_mainMenu.LevelSelected);
-            _camera.Boundaries = new Vector2(_levelControl.Tilemap.MapPixelWidth, _levelControl.Tilemap.MapPixelHeight);
-            _camera.ForceZoom(0.7f);
+            Context.Camera.Boundaries = new Vector2(_levelControl.Tilemap.MapPixelWidth, _levelControl.Tilemap.MapPixelHeight);
+            Context.Camera.ForceZoom(0.7f);
         }
 
         protected override void Initialize()
@@ -96,24 +96,27 @@ namespace LabRat
 
         protected override void LoadContent()
         {
+            Debug.WriteLine("Load begin");
             _spriteBatch = new SpriteBatch(GraphicsDevice);
+            //DebugManager.LoadContent(this);
             LoadGame();
 
             _mainMenu = new MainMenu(new Vector2(_graphics.GraphicsDevice.Viewport.Width / 2 - 200, 200), MaxLevels, _levelsCompleted, Exit, HandleLevelStart);
             _mainMenu.LoadContent(Content);
-            _camera = new Camera(_graphics);
-            _levelControl = new LevelControl(HandleBackToMenu, SaveGame);
+            Context.Camera = new Camera(_graphics);
+            _levelControl = new LevelControl(this, HandleBackToMenu, SaveGame);
             _levelControl.LoadContent(Content);
             Context.Player = new Player(new Vector2(500,1500), HandleSpawnClone, HandleDespawnClone);
             Context.Player.LoadContent(Content);
 
 
             _characters.Add(Context.Player);
+            Debug.WriteLine("Load end");
         }
 
 
         protected override void Update(GameTime gameTime)
-        { 
+        {
             InputManager.Update(gameTime);
             if (!_playing)
             {
@@ -131,11 +134,10 @@ namespace LabRat
                 if(_newCharacters.Contains(character)) _newCharacters.Remove(character);
             }
 
-            PhysicsHelper.ResolveClonePhysics(_characters, gameTime);
+            PhysicsHelper.ResolveClonePhysics(_characters);
             CollisionHelper.ResolveCollisions(_characters, _levelControl.Tilemap.Colliders, 3);
 
-
-            _camera.Follow(Context.Player.Position + _camOffset);
+            Context.Camera.Follow(Context.Player.Position + _camOffset);
 
             base.Update(gameTime);
 
@@ -164,13 +166,13 @@ namespace LabRat
             GraphicsDevice.Clear(_bgColor);
             if (_playing)
             {
-                _spriteBatch.Begin(sortMode: SpriteSortMode.BackToFront, transformMatrix: _camera.Transform);
+                _spriteBatch.Begin(sortMode: SpriteSortMode.BackToFront, transformMatrix: Context.Camera.Transform);
                 _levelControl.Draw(_spriteBatch);
                 foreach (Character character in _characters) character.Draw(_spriteBatch);
             }
             else
             {
-                _spriteBatch.Begin(transformMatrix: _camera.Transform);
+                _spriteBatch.Begin(transformMatrix: Context.Camera.Transform);
                 _mainMenu.Draw(_spriteBatch);
 
             }

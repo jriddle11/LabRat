@@ -10,6 +10,10 @@ namespace LabRat
         public Vector2 Position { get; set; }
         public Vector2 Velocity { get; set; }
 
+        public Direction Direction { get; set; } = Direction.Right;
+
+        public bool IsHeld = false;
+
         public bool EntityCollision = false;
 
         public bool IsGrounded;
@@ -32,6 +36,8 @@ namespace LabRat
             }
         }
 
+        public Vector2 ColliderOffset = new Vector2(90, 38);
+
         private BoundingRectangle _collider;
 
         public BoundingCircle FloorCollider
@@ -46,7 +52,7 @@ namespace LabRat
             }
         }
 
-        private BoundingCircle _floorCollider = new(new Vector2(32,64), 20);
+        private BoundingCircle _floorCollider = new(new Vector2(140,140), 15);
 
         public Character()
         {
@@ -75,7 +81,14 @@ namespace LabRat
         public void UnGroundCharacter()
         {
             IsGrounded = false;
+            IsHeld = false;
             _floorTimer.Reset();
+        }
+
+        protected SpriteEffects GetEffect()
+        {
+            if (Direction == Direction.Left) return SpriteEffects.FlipHorizontally;
+            return SpriteEffects.None;
         }
 
         protected virtual void ResetEntityCollisions()
@@ -86,9 +99,9 @@ namespace LabRat
 
         public void UpdateCollider()
         {
-            _collider.X = Position.X;
-            _collider.Y = Position.Y;
-            _floorCollider.Center = Position + new Vector2(32, 64);
+            _collider.X = Position.X + ColliderOffset.X;
+            _collider.Y = Position.Y + ColliderOffset.Y;
+            _floorCollider.Center = Position + new Vector2(120, 140);
         }
 
         public abstract void LoadContent(ContentManager content);
