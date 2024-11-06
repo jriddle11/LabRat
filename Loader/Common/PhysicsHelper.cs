@@ -28,9 +28,12 @@ namespace LabRat
 
             if (top <= bottom)
             {
-                character.Position = new Vector2(otherCharacter.Position.X, otherCharacter.Position.Y - 100);
-                character.IsHeld = true;
-                character.Direction = otherCharacter.Direction;
+                //Sticking
+                //character.Position = new Vector2(otherCharacter.Position.X, otherCharacter.Position.Y - 100);
+                //character.IsHeld = true;
+                //character.Direction = otherCharacter.Direction;
+                //Riding
+                character.Position += otherCharacter.Velocity;
                 character.UpdateCollider();
             }
 

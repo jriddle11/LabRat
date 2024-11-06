@@ -98,7 +98,7 @@ namespace LabRat
             }
             if (_currentInput.PressSpace && IsGrounded)
             {
-                _gravity = -2.1f;
+                _gravity = -2.2f;
                 UnGroundCharacter();
             }
 

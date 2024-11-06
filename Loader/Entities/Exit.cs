@@ -30,7 +30,7 @@ namespace LabRat
 
         public void LoadContent(ContentManager content)
         {
-            _texture = content.Load<Texture2D>("player");
+            _texture = content.Load<Texture2D>("cheese");
             _collider = new(Position, _texture.Width, _texture.Height);
         }
 

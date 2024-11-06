@@ -8,6 +8,7 @@ namespace LabRat
 {
     public class Player : Character
     {
+        public int CloneAmount = 1;
         private PopupMenu _popupMenu = new();
         private List<PlayerClone> _clones = new();
         private int _maxClones = 20;
@@ -53,9 +54,9 @@ namespace LabRat
             foreach (PlayerClone clone in _clones) _deleteClone?.Invoke(clone);
             _clones.Clear();
             if (InputManager.Recording) InputManager.StopRecording();
-            InputManager.StartRecording();
             Position = _startPosition;
             IsHeld = false;
+            InputManager.StartRecording();
         }
 
         private void ResetPositions()
@@ -68,6 +69,7 @@ namespace LabRat
                 clone.Start();
             }
             base.ResetEntityCollisions();
+            InputManager.StartRecording();
         }
 
         private void RemoveOldClones()
@@ -99,6 +101,7 @@ namespace LabRat
 
             _popupMenu.LoadContent(content);
             _popupMenu.Refresh += Refresh;
+            _popupMenu.Reload += Reload;
         }
 
         public override void Update(GameTime gameTime)
@@ -115,6 +118,8 @@ namespace LabRat
             }
 
             _floorTimer.Update(gameTime);
+            _popupMenu.CanRefresh = _clones.Count < CloneAmount;
+            _popupMenu.CanReload = _clones.Count > 0;
             _popupMenu.Update(gameTime);
             UpdateVelocity(gameTime);
             ApplyVelocity(gameTime);
@@ -145,7 +150,7 @@ namespace LabRat
 
             if (InputManager.PressedSpace && IsGrounded)
             {
-                _gravity = -2.1f;
+                _gravity = -2.2f;
                 UnGroundCharacter();
             }
 
@@ -163,13 +168,17 @@ namespace LabRat
         {
             _popupMenu.Close();
             var inputQ = InputManager.StopRecording();
-            InputManager.StartRecording();
             var clone = new PlayerClone(_startPosition, inputQ);
 
             _spawnClone?.Invoke(clone);
             _clones.Add(clone);
 
             ResetPositions();
+        }
+
+        private void Reload(object sender, EventArgs e)
+        {
+            Reset();
         }
 
         private Texture2D GetTexture()

@@ -44,7 +44,7 @@ namespace LabRat
         private static MouseState _priorMouseState;
 
         //Recording
-        private static Queue<InputTimeStamp> _inputHistory;
+        private static Queue<InputTimeStamp> _inputHistory = new();
         public static bool Recording;
         private static float _recordCurrentTime;
         private static bool _recordingPressJump = false;
@@ -55,6 +55,9 @@ namespace LabRat
         {
             _inputHistory = new();
             _recordCurrentTime = 0;
+            _recordingPressJump = false;
+            _recordingHoldLeft = false;
+            _recordingHoldRight = false;
             _inputHistory.Enqueue(new InputTimeStamp(_recordCurrentTime));
             Recording = true;
         }

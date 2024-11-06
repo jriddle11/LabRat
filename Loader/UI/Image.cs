@@ -7,6 +7,8 @@ namespace LabRat
     {
         public Vector2 Position;
 
+        public Color Color = Color.White;
+
         public float LayerDepth = 0.95f;
 
         private Texture2D _texture;
@@ -31,7 +33,7 @@ namespace LabRat
 
         public void Draw(SpriteBatch spriteBatch)
         {
-            spriteBatch.Draw(_texture, Position, null, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, LayerDepth);
+            spriteBatch.Draw(_texture, Position, null, Color, 0f, Vector2.Zero, 1f, SpriteEffects.None, LayerDepth);
         }
     }
 }

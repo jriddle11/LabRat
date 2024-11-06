@@ -86,12 +86,10 @@ namespace LabRat
                         if (character.ID <= otherCharacter.ID) continue;
                         if (character.Velocity.Y < 0.5f) continue;
                         if (!character.EntityCollision) continue;
+                        if(character.Collider.Bottom > otherCharacter.Collider.Top + character.FloorCollider.Radius * 3) continue;
                         if (character.FloorCollider.CollidesWith(otherCharacter.Collider))
                         {
                             touchingFloor = true;
-                        }
-                        if (character.FloorCollider.CollidesWith(otherCharacter.Collider))
-                        {
                             SeparateFromOthers(character, otherCharacter);
                             collisionResolved = false;
                         }
@@ -214,37 +212,32 @@ namespace LabRat
 
         public static void SeparateFromOthers(Character character, Character otherCharacter)
         {
-            if (character.FloorCollider.CollidesWith(otherCharacter.Collider))
+            var top = character.FloorCollider.Bottom - otherCharacter.Collider.Top - character.FloorCollider.Radius - 5;
+            var bottom = otherCharacter.Collider.Bottom - character.FloorCollider.Top;
+
+            float overlapY = Math.Min(top, bottom);
+
+            int ySign = (overlapY == bottom) ? -1 : 1;
+
+            float adjustmentFactor = 0.5f;
+
+            if (top < bottom)
             {
-                var top = character.FloorCollider.Bottom - otherCharacter.Collider.Top - character.FloorCollider.Radius - 5;
-                var bottom = otherCharacter.Collider.Bottom - character.FloorCollider.Top;
+                character.Position = new Vector2(character.Position.X, character.Position.Y - overlapY * adjustmentFactor * ySign);
+                character.UpdateCollider();
+            }
 
-                float overlapY = Math.Min(top, bottom);
-
-                int ySign = (overlapY == bottom) ? -1 : 1;
-
-                float adjustmentFactor = 0.5f;
+            int iterations = 0;
+            while (character.Collider.CollidesWith(otherCharacter.Collider) && iterations < 10)
+            {
+                iterations++;
 
                 if (top < bottom)
                 {
-                    character.Position = new Vector2(character.Position.X, character.Position.Y - overlapY * adjustmentFactor * ySign);
+                    character.Position = new Vector2(character.Position.X, character.Position.Y - ySign * 0.1f);
                     character.UpdateCollider();
                 }
-
-                int iterations = 0;
-                while (character.Collider.CollidesWith(otherCharacter.Collider) && iterations < 10)
-                {
-                    iterations++;
-
-                    if (top < bottom)
-                    {
-                        character.Position = new Vector2(character.Position.X, character.Position.Y - ySign * 0.1f);
-                        character.UpdateCollider();
-                    }
-                }
             }
-
-
         }
 
     }

@@ -21,8 +21,6 @@ namespace LabRat
         private Form _refreshForm;
         private Form _cloneForm;
 
-        private Pyramid cube;
-
         private const int MaxLevels = 3;
         public LevelControl(LabRatGame game, Action backToMenu, Action saveGame)
         {
@@ -54,7 +52,6 @@ namespace LabRat
             Tilemap.LoadContent(content);
             _rootDir = content.RootDirectory;
             Tilemap.Offset = new Vector2(0, 0);
-            cube = new(_game);
         }
 
         private void LoadTutorialForms(ContentManager content)
@@ -107,7 +104,6 @@ namespace LabRat
             {
                 _backToMenu?.Invoke();
             }
-            cube.Update(gameTime);
             UpdateTutorialForms(gameTime);
             _exit.Update(gameTime);
         }
@@ -122,7 +118,6 @@ namespace LabRat
 
         public void Draw(SpriteBatch spriteBatch)
         {
-            cube.Draw();
             DrawTutorialForms(spriteBatch);
             Tilemap.Draw(spriteBatch);
             _exit.Draw(spriteBatch);

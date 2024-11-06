@@ -52,7 +52,7 @@ namespace LabRat
 
         private void LoadMainForm(ContentManager content)
         {
-            _mainForm = new(Position, FormType.Standard, "LabRat.exe");
+            _mainForm = new(Position, FormType.Standard, "Ultimate   Mouse");
             _mainForm.AddButton(new Button(HandleStartPress, Position + new Vector2(_mainForm.Width / 2, 100), true, "menu_btn", "menu_btn_press"));
             _mainForm.AddButton(new Button(HandleOptionsPress, Position + new Vector2(_mainForm.Width / 2, 200), true, "menu_btn", "menu_btn_press"));
             _mainForm.AddButton(new Button(HandleCreditsPress, Position + new Vector2(_mainForm.Width / 2, 300), true, "menu_btn", "menu_btn_press"));

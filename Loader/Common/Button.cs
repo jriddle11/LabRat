@@ -73,6 +73,12 @@ namespace LabRat
 
         }
 
+        public void Reset()
+        {
+            IsHeldDown = false;
+            IsHovering = false;
+        }
+
         public void Draw(SpriteBatch spriteBatch)
         {
             spriteBatch.Draw(IsHeldDown ? _hoverTexture : _texture, Position, null, Enabled ? Color.White : Color.Black, 0f, Vector2.Zero, 1f, SpriteEffects.None, LayerDepth);
