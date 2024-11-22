@@ -16,25 +16,30 @@ namespace LabRat
         private bool _centered = false;
         private bool _clicked = false;
         private Texture2D _texture;
+        private Texture2D _pressTexture;
         private Texture2D _hoverTexture;
         private string _texturePath;
+        private string _pressTexturePath;
         private string _hoverTexturePath;
 
         private BoundingRectangle _collider;
 
-        public Button(Action onButtonClick, Vector2 pos, bool centered, string texturePath, string hoverTexurePath = "")
+        public Button(Action onButtonClick, Vector2 pos, bool centered, string texturePath, string pressTexurePath = "", string hoverTexturePath = "")
         {
             _onButtonClick = onButtonClick;
             _centered = centered;
             Position = pos;
             _texturePath = texturePath;
-            _hoverTexturePath = hoverTexurePath;
+            _pressTexturePath = pressTexurePath;
+            _hoverTexturePath = hoverTexturePath;
         }
 
         public void LoadContent(ContentManager content)
         {
             _texture = content.Load<Texture2D>(_texturePath);
             if (_centered) Position -= new Vector2(_texture.Width / 2, 0);
+            if (_pressTexturePath != "") _pressTexture = content.Load<Texture2D>(_pressTexturePath);
+            else _pressTexture = _texture;
             if (_hoverTexturePath != "") _hoverTexture = content.Load<Texture2D>(_hoverTexturePath);
             else _hoverTexture = _texture;
         }
@@ -81,7 +86,10 @@ namespace LabRat
 
         public void Draw(SpriteBatch spriteBatch)
         {
-            spriteBatch.Draw(IsHeldDown ? _hoverTexture : _texture, Position, null, Enabled ? Color.White : Color.Black, 0f, Vector2.Zero, 1f, SpriteEffects.None, LayerDepth);
+            Texture2D texture = _texture;
+            if (IsHovering) texture = _hoverTexture;
+            if (IsHeldDown) texture = _pressTexture;
+            spriteBatch.Draw(texture, Position, null, Enabled ? Color.White : Color.Black, 0f, Vector2.Zero, 1f, SpriteEffects.None, LayerDepth);
         }
     }
 

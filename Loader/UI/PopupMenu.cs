@@ -29,32 +29,33 @@ namespace LabRat
 
         public void LoadContent(ContentManager content)
         {
-            _popupTop = content.Load<Texture2D>("popup_top");
-            _popupBottom = content.Load<Texture2D>("popup_bottom");
-            _popupBtn = content.Load<Texture2D>("popup_button");
+            _popupTop = content.Load<Texture2D>("forms/popup_top");
+            _popupBottom = content.Load<Texture2D>("forms/popup_bottom");
+            _popupBtn = content.Load<Texture2D>("forms/popup_button");
 
-            _refreshBtn = new(HandleRefresh, Position, false, "popup_button", "popup_button_press");
+            _refreshBtn = new(HandleRefresh, Position, false, "forms/popup_button", "forms/popup_button_press");
             _refreshBtn.LoadContent(content);
             _refreshBtn.LayerDepth = 0.01f;
             _refreshBtn.Mode = ButtonMode.Hover;
 
-            _refreshImage = new(Position, "refresh_text");
+            _refreshImage = new(Position, "forms/refresh_text");
             _refreshImage.LoadContent(content);
             _refreshImage.LayerDepth = 0f;
 
-            _spaceBtn = new(null, Position, false, "popup_button", "popup_button");
+            _spaceBtn = new(null, Position, false, "forms/popup_button", "forms/popup_button");
             _spaceBtn.LoadContent(content);
             _spaceBtn.LayerDepth = 0.01f;
             _spaceBtn.Mode = ButtonMode.Hover;
 
-            _restartBtn = new(HandleReload, Position, false, "popup_button", "popup_button_press");
+            _restartBtn = new(HandleReload, Position, false, "forms/popup_button", "forms/popup_button_press");
             _restartBtn.LoadContent(content);
             _restartBtn.LayerDepth = 0.01f;
             _restartBtn.Mode = ButtonMode.Hover;
 
-            _restartImage = new(Position, "restart_text");
+            _restartImage = new(Position, "forms/restart_text");
             _restartImage.LoadContent(content);
             _restartImage.LayerDepth = 0f;
+            _restartImage.Color = Color.Black;
         }
 
         public void Open()
@@ -97,16 +98,7 @@ namespace LabRat
                 _refreshImage.Color = Color.DarkGray;
             }
 
-            if(CanReload)
-            {
-                _restartImage.Color = Color.Black;
-                _restartBtn.Update(gameTime);
-            }
-            else
-            {
-                _restartBtn.Reset();
-                _restartImage.Color = Color.DarkGray;
-            }
+            _restartBtn.Update(gameTime);
             var buttonsPos = new Vector2(Position.X, Position.Y + _popupTop.Height);
             var offset = new Vector2(0, _popupBtn.Height);
             _refreshBtn.Position = buttonsPos;

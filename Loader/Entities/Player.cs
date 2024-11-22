@@ -48,6 +48,19 @@ namespace LabRat
             Reset();
         }
 
+        public bool CollidesWithClones(BoundingRectangle rect)
+        {
+            bool col = false;
+            foreach(PlayerClone clone in _clones)
+            {
+                if (rect.CollidesWith(clone.FloorCollider))
+                {
+                    col = true;
+                }
+            }
+            return col;
+        }
+
         public void Reset()
         {
             _popupMenu.Close();

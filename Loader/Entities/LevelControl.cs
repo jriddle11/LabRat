@@ -1,5 +1,6 @@
-﻿using Microsoft.Xna.Framework.Content;
+﻿using Microsoft.Xna.Framework.Media;
 using Microsoft.Xna.Framework.Graphics;
+using MonoGame.Framework;
 
 namespace LabRat
 {
@@ -8,32 +9,34 @@ namespace LabRat
         public int Level { get; private set; }
         public Tilemap Tilemap;
 
-        private LabRatGame _game;
-
         private Exit _exit;
+        private LevelDesigner _handler = new();
 
         private string _rootDir;
         private Action _backToMenu;
         private Action _save;
 
-        private Form _moveForm;
-        private Form _jumpForm;
-        private Form _refreshForm;
-        private Form _cloneForm;
+        private VideoPlayer _videoPlayer = new();
+        private Video _video;
+        private bool _playing = false;
 
-        private const int MaxLevels = 3;
-        public LevelControl(LabRatGame game, Action backToMenu, Action saveGame)
+        private Texture2D _bgtexture;
+        private Texture2D _border;
+        private Texture2D _currentVideoFrame;
+
+        private int _maxLevels = 3;
+        public LevelControl(int maxLevels, Action backToMenu, Action saveGame)
         {
             Tilemap = new("tileload.txt");
+            _maxLevels = maxLevels;
             _backToMenu = backToMenu;
             _save = saveGame;
             _exit = new Exit(Vector2.Zero, HandleExit);
-            _game = game;
         }
 
         private void HandleExit()
         {
-            if(Level < MaxLevels)
+            if(Level < _maxLevels)
             {
                 Level += 1;
                 _save?.Invoke();
@@ -47,55 +50,29 @@ namespace LabRat
 
         public void LoadContent(ContentManager content)
         {
-            LoadTutorialForms(content);
+            _handler.LoadContent(content);
             _exit.LoadContent(content);
             Tilemap.LoadContent(content);
             _rootDir = content.RootDirectory;
             Tilemap.Offset = new Vector2(0, 0);
-        }
-
-        private void LoadTutorialForms(ContentManager content)
-        {
-            var _moveFormPos = new Vector2(600, 1200);
-            var _jumpFormPos = new Vector2(2500, 1200);
-            var _refreshFormPos = new Vector2(2200, 800);
-            var _cloneFormPos = new Vector2(2200, 1100);
-
-            _moveForm = new(_moveFormPos, FormType.Small, "Tutorial.exe");
-            _moveForm.AddImage(new Image(_moveFormPos, "sign_move"));
-            _moveForm.LoadContent(content);
-
-            _jumpForm = new(_jumpFormPos, FormType.Small, "Tutorial.exe");
-            _jumpForm.AddImage(new Image(_jumpFormPos, "sign_jump"));
-            _jumpForm.LoadContent(content);
-
-            _refreshForm = new(_refreshFormPos, FormType.Small, "Tutorial.exe");
-            _refreshForm.AddImage(new Image(_refreshFormPos, "sign_time"));
-            _refreshForm.LoadContent(content);
-
-            _cloneForm = new(_cloneFormPos, FormType.Small, "Tutorial.exe");
-            _cloneForm.AddImage(new Image(_cloneFormPos, "sign_clone"));
-            _cloneForm.LoadContent(content);
-        }
-
-        private void ResetForms()
-        {
-            _moveForm.Enabled = true;
-            _jumpForm.Enabled = true;
-            _refreshForm.Enabled = true;
-            _cloneForm.Enabled = true;
+            _video = content.Load<Video>("lab");
+            _bgtexture = content.Load<Texture2D>("tiles_bg");
+            _border = content.Load<Texture2D>("border");
+            Debug.WriteLine(_video.Duration);
+            Debug.WriteLine(_video.Width);
+            _playing = true;
         }
 
         public void LoadLevel(int level)
         {
             Level = level;
-            Tilemap.LoadMap("level" + level + ".txt", _rootDir);
+            Tilemap.LoadMap("levels/level" + level + ".txt", _rootDir);
+            _handler.SetupFor(level);
             if(InputManager.Recording)InputManager.StopRecording();
             InputManager.StartRecording();
             _exit.UpdatePosition(Tilemap.EndPosition);
             Context.Player.UpdateStartPosition(Tilemap.StartPosition);
             _exit.Exited = false;
-            ResetForms();
         }
 
         public void Update(GameTime gameTime)
@@ -104,37 +81,33 @@ namespace LabRat
             {
                 _backToMenu?.Invoke();
             }
-            UpdateTutorialForms(gameTime);
+            if (_playing)
+            {
+                if (_videoPlayer.State == MediaState.Stopped)
+                {
+                    _videoPlayer.Play(_video);
+                }
+            }
+            _handler.Update(gameTime);
             _exit.Update(gameTime);
-        }
-
-        private void UpdateTutorialForms(GameTime gameTime)
-        {
-            _moveForm.Update(gameTime);
-            _jumpForm.Update(gameTime);
-            _refreshForm.Update(gameTime);
-            _cloneForm.Update(gameTime);
         }
 
         public void Draw(SpriteBatch spriteBatch)
         {
-            DrawTutorialForms(spriteBatch);
+            spriteBatch.Draw(_bgtexture, Vector2.Zero, null, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 1f);
+            spriteBatch.Draw(_border, new Vector2(1280, 600), null, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, .999f);
+            if (_videoPlayer.State == MediaState.Playing)
+            {
+                _currentVideoFrame = _videoPlayer.GetTexture();
+
+            }
+            if(_currentVideoFrame != null)
+            {
+                spriteBatch.Draw(_currentVideoFrame, new Vector2(1280,600), null, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 1f);
+            }
+            _handler.Draw(spriteBatch);
             Tilemap.Draw(spriteBatch);
             _exit.Draw(spriteBatch);
-        }
-        
-        private void DrawTutorialForms(SpriteBatch spriteBatch)
-        {
-            if (Level == 1)
-            {
-                _moveForm.Draw(spriteBatch);
-                _jumpForm.Draw(spriteBatch);
-            }
-            if(Level == 2)
-            {
-                _refreshForm.Draw(spriteBatch);
-                _cloneForm.Draw(spriteBatch);
-            }
         }
     }
 }

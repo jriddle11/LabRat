@@ -111,7 +111,7 @@ namespace LabRat
                     int index = _map[y * _mapWidth + x] - 1;
                     if (index == -1) continue;
                     var pos = new Vector2(x * (_tileWidth - DoublePadding), y * (_tileHeight - DoublePadding)) + Offset;
-                    spriteBatch.Draw(_tilesetTexture, pos, _tiles[index], Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 1f);
+                    spriteBatch.Draw(_tilesetTexture, pos, _tiles[index], Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, .95f);
                     if (!_collisionsSet)
                     {
                         Colliders.Add(new BoundingRectangle(pos, _tileWidth - DoublePadding, _tileHeight - DoublePadding));

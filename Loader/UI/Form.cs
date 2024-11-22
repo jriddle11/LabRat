@@ -39,12 +39,12 @@ namespace LabRat
 
         public void LoadContent(ContentManager content)
         {
-            _menuBg = content.Load<Texture2D>("menu_bg");
-            _menuBgBig = content.Load<Texture2D>("menu_bg_big");
-            _menuBgSmall = content.Load<Texture2D>("menu_bg_small");
+            _menuBg = content.Load<Texture2D>("forms/menu_bg");
+            _menuBgBig = content.Load<Texture2D>("forms/menu_bg_big");
+            _menuBgSmall = content.Load<Texture2D>("forms/menu_bg_small");
 
-            Buttons.Add(new Button(CloseForm, Position + new Vector2(GetTexture().Width - 23, 5), true, "menu_close_btn", "menu_close_btn_press"));
-            Texts.Add(new Text(Position + new Vector2(13, 5), _title, Color.White, false));
+            Buttons.Add(new Button(CloseForm, Position + new Vector2(GetTexture().Width - 60, 0), false, "forms/menu_close_btn", "forms/menu_close_btn_press", "forms/menu_close_btn_hover"));
+            Texts.Add(new Text(Position + new Vector2(13, 5), _title, Color.Black, false));
 
             foreach (Button button in Buttons) button.LoadContent(content);
             foreach(Text text in Texts) text.LoadContent(content);
@@ -66,6 +66,14 @@ namespace LabRat
             Texts.Add(text);
         }
 
+        public void Reset()
+        {
+            Buttons.Clear();
+            Images.Clear();
+            Texts.Clear();
+            CloseForm();
+        }
+
         public void Update(GameTime gameTime)
         {
             if (!Initialized || !Enabled) return;
@@ -75,7 +83,7 @@ namespace LabRat
         public void Draw(SpriteBatch spriteBatch)
         {
             if (!Initialized || !Enabled) return;
-            spriteBatch.Draw(GetTexture(), Position, null, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 1f);
+            spriteBatch.Draw(GetTexture(), Position, null, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, .98f);
             foreach (Button button in Buttons) button.Draw(spriteBatch);
             foreach(Text text in Texts) text.Draw(spriteBatch);
             foreach(Image image in Images) image.Draw(spriteBatch);

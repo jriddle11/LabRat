@@ -16,8 +16,8 @@ namespace LabRat
         private Form _creditsForm;
         private Form _levelsForm;
 
-        private Color _headerFontColor = Color.White;
-        private Color _bodyFontColor = Color.Black;
+        private Color _white = Color.White;
+        private Color _black = new Color(60,60,60);
 
         private Action _quit;
         private Action _startLevel;
@@ -48,24 +48,25 @@ namespace LabRat
             LoadCreditForm(content);
             LoadOptionsForm(content);
             LoadLevelForm(content);
+            SoundManager.PlaySongMuffled();
         }
 
         private void LoadMainForm(ContentManager content)
         {
             _mainForm = new(Position, FormType.Standard, "Ultimate   Mouse");
-            _mainForm.AddButton(new Button(HandleStartPress, Position + new Vector2(_mainForm.Width / 2, 100), true, "menu_btn", "menu_btn_press"));
-            _mainForm.AddButton(new Button(HandleOptionsPress, Position + new Vector2(_mainForm.Width / 2, 200), true, "menu_btn", "menu_btn_press"));
-            _mainForm.AddButton(new Button(HandleCreditsPress, Position + new Vector2(_mainForm.Width / 2, 300), true, "menu_btn", "menu_btn_press"));
-            _mainForm.AddText(new Text(Position + new Vector2(_mainForm.Width / 2, 110), "START", _headerFontColor, true));
-            _mainForm.AddText(new Text(Position + new Vector2(_mainForm.Width / 2, 210), "OPTIONS", _headerFontColor, true));
-            _mainForm.AddText(new Text(Position + new Vector2(_mainForm.Width / 2, 310), "CREDITS", _headerFontColor, true));
+            _mainForm.AddButton(new Button(HandleStartPress, Position + new Vector2(_mainForm.Width / 2, 100), true, "forms/menu_btn", "forms/menu_btn_press", "forms/menu_btn_hover"));
+            _mainForm.AddButton(new Button(HandleOptionsPress, Position + new Vector2(_mainForm.Width / 2, 200), true, "forms/menu_btn", "forms/menu_btn_press", "forms/menu_btn_hover"));
+            _mainForm.AddButton(new Button(HandleCreditsPress, Position + new Vector2(_mainForm.Width / 2, 300), true, "forms/menu_btn", "forms/menu_btn_press", "forms/menu_btn_hover"));
+            _mainForm.AddText(new Text(Position + new Vector2(_mainForm.Width / 2, 110), "START", _black, true));
+            _mainForm.AddText(new Text(Position + new Vector2(_mainForm.Width / 2, 210), "OPTIONS", _black, true));
+            _mainForm.AddText(new Text(Position + new Vector2(_mainForm.Width / 2, 310), "CREDITS", _black, true));
             _mainForm.LoadContent(content);
         }
 
         private void LoadOptionsForm(ContentManager content)
         {
             _optionsForm = new(_optionsPos, FormType.Standard, "Options");
-            _optionsForm.AddText(new Text(_optionsPos + new Vector2(_optionsForm.Width / 2, 210), "Under  Construction", _bodyFontColor, true));
+            _optionsForm.AddText(new Text(_optionsPos + new Vector2(_optionsForm.Width / 2, 210), "Under  Construction", _black, true));
             _optionsForm.LoadContent(content);
             _optionsForm.Enabled = false;
         }
@@ -78,9 +79,9 @@ namespace LabRat
             {
                 int level = i;
                 var pos = _levelsPos + new Vector2(54 + ((i * 55) % 550), 70 + 70 * ((i / 10)));
-                var button = new Button(() => HandleLevelPress(level + 1), pos, true, "menu_level_btn", "menu_level_btn_press");
-                var text = new Text(pos - (level > 8 ? new Vector2(12, 0) : new Vector2(5, 0)), "" + (level + 1), _headerFontColor, false);
-                if (level > _highestLevel)
+                var button = new Button(() => HandleLevelPress(level + 1), pos, true, "forms/menu_level_btn", "forms/menu_level_btn_press", "forms/menu_level_btn_hover");
+                var text = new Text(pos - (level > 8 ? new Vector2(12, 0) : new Vector2(5, 0)), "" + (level + 1), _black, false);
+                if (level > _highestLevel + 1)
                 {
                     button.Enabled = false;
                     text.Enabled = false;
@@ -115,8 +116,8 @@ namespace LabRat
         private void LoadCreditForm(ContentManager content)
         {
             _creditsForm = new(_creditPos, FormType.Standard, "Credits");
-            _creditsForm.AddText(new Text(_creditPos + new Vector2(_creditsForm.Width / 2, 110), "Created   by", _bodyFontColor, true));
-            _creditsForm.AddText(new Text(_creditPos + new Vector2(_creditsForm.Width / 2, 210), "Joshua   Riddle", _bodyFontColor, true));
+            _creditsForm.AddText(new Text(_creditPos + new Vector2(_creditsForm.Width / 2, 110), "Created   by", _black, true));
+            _creditsForm.AddText(new Text(_creditPos + new Vector2(_creditsForm.Width / 2, 210), "Josh   Riddle", _black, true));
 
             _creditsForm.LoadContent(content);
             _creditsForm.Enabled = false;

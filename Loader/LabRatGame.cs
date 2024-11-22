@@ -17,11 +17,11 @@ namespace LabRat
         private List<Character> _deleteCharacters = new();
         private bool _playing = false;
 
-        private readonly Color _bgColor = new Color(19,19,19);
+        private readonly Color _bgColor = new Color(30,30,30);
 
         private int _levelsCompleted = 0;
 
-        private const int MaxLevels = 3;
+        private const int MaxLevels = 4;
 
         public LabRatGame()
         {
@@ -47,6 +47,7 @@ namespace LabRat
 
         public void HandleBackToMenu()
         {
+            SoundManager.PlaySongMuffled();
             Context.Player.Reset();
             _playing = false;
             Context.Camera.Reset();
@@ -68,6 +69,7 @@ namespace LabRat
             _levelControl.LoadLevel(_mainMenu.LevelSelected);
             Context.Camera.Boundaries = new Vector2(_levelControl.Tilemap.MapPixelWidth, _levelControl.Tilemap.MapPixelHeight);
             Context.Camera.ForceZoom(0.7f);
+            SoundManager.PlaySong();
         }
 
         protected override void Initialize()
@@ -96,28 +98,30 @@ namespace LabRat
 
         protected override void LoadContent()
         {
-            Debug.WriteLine("Load begin");
             _spriteBatch = new SpriteBatch(GraphicsDevice);
             //DebugManager.LoadContent(this);
             LoadGame();
+            SoundManager.LoadContent(Content);
 
             _mainMenu = new MainMenu(new Vector2(_graphics.GraphicsDevice.Viewport.Width / 2 - 200, 200), MaxLevels, _levelsCompleted, Exit, HandleLevelStart);
             _mainMenu.LoadContent(Content);
             Context.Camera = new Camera(_graphics);
-            _levelControl = new LevelControl(this, HandleBackToMenu, SaveGame);
+            _levelControl = new LevelControl(MaxLevels, HandleBackToMenu, SaveGame);
             _levelControl.LoadContent(Content);
             Context.Player = new Player(new Vector2(500,1500), HandleSpawnClone, HandleDespawnClone);
             Context.Player.LoadContent(Content);
 
-
             _characters.Add(Context.Player);
-            Debug.WriteLine("Load end");
         }
 
 
         protected override void Update(GameTime gameTime)
         {
             InputManager.Update(gameTime);
+            if (InputManager.Mouse1Clicked || InputManager.Mouse2Clicked)
+            {
+                SoundManager.PlayMouseClick();
+            }
             if (!_playing)
             {
                 _mainMenu.Update(gameTime);

@@ -55,9 +55,6 @@ namespace LabRat
         {
             _inputHistory = new();
             _recordCurrentTime = 0;
-            _recordingPressJump = false;
-            _recordingHoldLeft = false;
-            _recordingHoldRight = false;
             _inputHistory.Enqueue(new InputTimeStamp(_recordCurrentTime));
             Recording = true;
         }

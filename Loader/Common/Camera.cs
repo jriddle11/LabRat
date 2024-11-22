@@ -45,7 +45,6 @@ namespace LabRat
         public void Follow(Vector2 position)
         {
             AdjustZoom();
-
             _position = new Vector2(position.X + 120 - (_viewport.Width / 2) / _zoom,
                                     position.Y + 75 - (_viewport.Height / 2) / _zoom);
 

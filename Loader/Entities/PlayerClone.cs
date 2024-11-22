@@ -82,8 +82,8 @@ namespace LabRat
 
             if (_currentInput.Time <= _currentTime && _activeInputs.Count == 0)
             {
-                _currentInput = InputTimeStamp.NoInput;
-                //IsActive = false;
+                //_currentInput = InputTimeStamp.NoInput;
+                IsActive = false;
             }
 
             if (_currentInput.HoldRight && !IsHeld)
