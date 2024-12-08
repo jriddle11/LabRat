@@ -9,6 +9,8 @@ namespace LabRat
     public class Player : Character
     {
         public int CloneAmount = 1;
+        public bool Frozen = false;
+
         private PopupMenu _popupMenu = new();
         private List<PlayerClone> _clones = new();
         private int _maxClones = 20;
@@ -19,6 +21,7 @@ namespace LabRat
         private Texture2D _playerIdle;
         private Texture2D _playerRun;
         private Texture2D _playerJump;
+        private Texture2D _last;
 
         public Texture2D CloneIdle;
         public Texture2D CloneRun;
@@ -119,6 +122,11 @@ namespace LabRat
 
         public override void Update(GameTime gameTime)
         {
+            if (Frozen)
+            {
+                _popupMenu.Close();
+                return;
+            }
             _animationTimer += (float)gameTime.ElapsedGameTime.TotalSeconds;
             if (_animationTimer >= FrameTime)
             {
@@ -138,6 +146,7 @@ namespace LabRat
             ApplyVelocity(gameTime);
             if (InputManager.Mouse2Clicked && EntityCollision)
             {
+                _popupMenu.RefreshCount = CloneAmount - _clones.Count;
                 _popupMenu.Position = InputManager.GetMousePosition();
                 _popupMenu.Open();
             }
@@ -163,6 +172,7 @@ namespace LabRat
 
             if (InputManager.PressedSpace && IsGrounded)
             {
+                SoundManager.PlayJumpSound();
                 _gravity = -2.2f;
                 UnGroundCharacter();
             }
@@ -196,18 +206,19 @@ namespace LabRat
 
         private Texture2D GetTexture()
         {
+            if (Frozen) return _last;
             if ((InputManager.HoldingLeft || InputManager.HoldingRight) && IsGrounded && !IsHeld)
             {
                 FrameTime = 0.02f;
-                return _playerRun;
+                return _last = _playerRun;
             }
             if (!IsGrounded)
             {
                 FrameTime = 0.02f;
-                return _playerJump;
+                return _last = _playerJump;
             }
             FrameTime = 0.05f;
-            return _playerIdle;
+            return _last = _playerIdle;
         }
 
         public override void Draw(SpriteBatch spriteBatch)

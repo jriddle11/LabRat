@@ -18,14 +18,11 @@ namespace LabRat
         private bool _playing = false;
 
         private readonly Color _bgColor = new Color(30,30,30);
-
         private int _levelsCompleted = 0;
-
-        private const int MaxLevels = 4;
+        private const int MaxLevels = 8;
 
         public LabRatGame()
         {
-            Debug.WriteLine("We have begun");
             Instance = this;
             _graphics = new GraphicsDeviceManager(this);
             _graphics.PreferredBackBufferWidth = 1600;
@@ -45,8 +42,10 @@ namespace LabRat
             _deleteCharacters.Add(c);
         }
 
-        public void HandleBackToMenu()
+        public void HandleBackToMenu(bool winner)
         {
+            _mainMenu.BackToMenu(_levelsCompleted);
+            if (winner) _mainMenu.Winner();
             SoundManager.PlaySongMuffled();
             Context.Player.Reset();
             _playing = false;
@@ -74,7 +73,6 @@ namespace LabRat
 
         protected override void Initialize()
         {
-            //Window.IsBorderless = true;
             base.Initialize();
         }
 
@@ -91,7 +89,6 @@ namespace LabRat
                 {
                     _levelsCompleted = _levelControl.Level - 1;
                 }
-                _mainMenu.UpdateLevels(_levelsCompleted);
             }
             SaveManager.SaveGame(_levelsCompleted);
         }
@@ -99,13 +96,13 @@ namespace LabRat
         protected override void LoadContent()
         {
             _spriteBatch = new SpriteBatch(GraphicsDevice);
-            //DebugManager.LoadContent(this);
             LoadGame();
             SoundManager.LoadContent(Content);
 
             _mainMenu = new MainMenu(new Vector2(_graphics.GraphicsDevice.Viewport.Width / 2 - 200, 200), MaxLevels, _levelsCompleted, Exit, HandleLevelStart);
             _mainMenu.LoadContent(Content);
             Context.Camera = new Camera(_graphics);
+            Context.Camera.LoadContent(Content);
             _levelControl = new LevelControl(MaxLevels, HandleBackToMenu, SaveGame);
             _levelControl.LoadContent(Content);
             Context.Player = new Player(new Vector2(500,1500), HandleSpawnClone, HandleDespawnClone);
@@ -114,14 +111,9 @@ namespace LabRat
             _characters.Add(Context.Player);
         }
 
-
         protected override void Update(GameTime gameTime)
         {
             InputManager.Update(gameTime);
-            if (InputManager.Mouse1Clicked || InputManager.Mouse2Clicked)
-            {
-                SoundManager.PlayMouseClick();
-            }
             if (!_playing)
             {
                 _mainMenu.Update(gameTime);
@@ -141,6 +133,7 @@ namespace LabRat
             PhysicsHelper.ResolveClonePhysics(_characters);
             CollisionHelper.ResolveCollisions(_characters, _levelControl.Tilemap.Colliders, 3);
 
+            Context.Camera.Update(gameTime);
             Context.Camera.Follow(Context.Player.Position + _camOffset);
 
             base.Update(gameTime);
@@ -171,6 +164,7 @@ namespace LabRat
             if (_playing)
             {
                 _spriteBatch.Begin(sortMode: SpriteSortMode.BackToFront, transformMatrix: Context.Camera.Transform);
+                Context.Camera.Draw(_spriteBatch);
                 _levelControl.Draw(_spriteBatch);
                 foreach (Character character in _characters) character.Draw(_spriteBatch);
             }

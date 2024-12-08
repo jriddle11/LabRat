@@ -6,7 +6,7 @@ namespace LabRat
     /// <summary>
     /// Object for changing the viewport location, following the player, and zooming in/out in steps.
     /// </summary>
-    public class Camera
+    public class Camera : IGameObject
     {
         public bool CanZoom = false;
         public Matrix Transform { get; private set; } = Matrix.Identity;
@@ -26,6 +26,7 @@ namespace LabRat
         const float MinZoom = 0.7f;
         const float MaxZoom = 1f; 
         int _previousScrollValue;
+        public Cover Cover = new Cover();
 
         public Camera(GraphicsDeviceManager graphics)
         {
@@ -81,6 +82,21 @@ namespace LabRat
             _zoom = MathHelper.Clamp(_zoom, MinZoom, MaxZoom);
 
             _previousScrollValue = currentScrollValue;
+        }
+
+        public void LoadContent(ContentManager content)
+        {
+            Cover.LoadContent(content);
+        }
+
+        public void Update(GameTime gameTime)
+        {
+            Cover?.Update(gameTime);
+        }
+
+        public void Draw(SpriteBatch spriteBatch)
+        {
+            Cover.Draw(spriteBatch);
         }
     }
 }

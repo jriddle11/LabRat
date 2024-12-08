@@ -12,6 +12,8 @@ namespace LabRat
     {
         public Vector2 Position;
         public bool Enabled = true;
+
+        public float LayerDepth = .98f;
         public static bool Initialized => _menuBg != null;
         public List<Button> Buttons = new();
         public List<Text> Texts = new();
@@ -83,7 +85,7 @@ namespace LabRat
         public void Draw(SpriteBatch spriteBatch)
         {
             if (!Initialized || !Enabled) return;
-            spriteBatch.Draw(GetTexture(), Position, null, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, .98f);
+            spriteBatch.Draw(GetTexture(), Position, null, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, LayerDepth);
             foreach (Button button in Buttons) button.Draw(spriteBatch);
             foreach(Text text in Texts) text.Draw(spriteBatch);
             foreach(Image image in Images) image.Draw(spriteBatch);

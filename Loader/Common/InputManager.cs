@@ -110,6 +110,33 @@ namespace LabRat
             _priorMouseState = _currentMouseState;
             _currentMouseState = Mouse.GetState();
 
+            if (_priorMouseState.RightButton == ButtonState.Released && _currentMouseState.RightButton == ButtonState.Pressed)
+            {
+                SoundManager.PlayMouseClickFull();
+            }
+            if (_priorMouseState.LeftButton == ButtonState.Released && _currentMouseState.LeftButton == ButtonState.Pressed)
+            {
+                SoundManager.PlayMouseClickFull();
+            }
+
+            /*
+            if(_priorMouseState.LeftButton == ButtonState.Pressed && _currentMouseState.LeftButton == ButtonState.Released)
+            {
+                SoundManager.PlayMouseClickUp();
+            }
+            if (_priorMouseState.LeftButton == ButtonState.Released && _currentMouseState.LeftButton == ButtonState.Pressed)
+            {
+                SoundManager.PlayMouseClickDown();
+            }
+            if (_priorMouseState.RightButton == ButtonState.Pressed && _currentMouseState.RightButton == ButtonState.Released)
+            {
+                SoundManager.PlayMouseClickUp();
+            }
+            if (_priorMouseState.RightButton == ButtonState.Released && _currentMouseState.RightButton == ButtonState.Pressed)
+            {
+                SoundManager.PlayMouseClickDown();
+            }*/
+
             #endregion
 
             #region Keyboard

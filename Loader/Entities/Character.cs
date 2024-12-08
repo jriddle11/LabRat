@@ -91,7 +91,7 @@ namespace LabRat
             return SpriteEffects.None;
         }
 
-        protected virtual void ResetEntityCollisions()
+        public virtual void ResetEntityCollisions()
         {
             _collisionTimer.Reset();
             EntityCollision = false;

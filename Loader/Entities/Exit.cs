@@ -36,8 +36,9 @@ namespace LabRat
 
         public void Update(GameTime gameTime)
         {
-            if (_collider.CollidesWith(Context.Player.Collider) && !Exited)
+            if (_collider.CollidesWith(Context.Player.Collider) && !Exited && Context.Player.EntityCollision)
             {
+                Context.Player.ResetEntityCollisions();
                 Exited = true;
                 _exitLevel?.Invoke();
             }
@@ -45,7 +46,7 @@ namespace LabRat
 
         public void Draw(SpriteBatch spriteBatch)
         {
-            spriteBatch.Draw(_texture, Position, Color.Yellow);
+            spriteBatch.Draw(_texture, Position, null, Color.Yellow, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0.01f);
         }
     }
 }

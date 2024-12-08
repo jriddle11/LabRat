@@ -9,6 +9,7 @@ namespace LabRat
         public Vector2 Position;
         public Color Color;
         public float Scale = 1f;
+        public float LayerDepth = 0.85f;
 
         private string _text;
         private bool _centered;
@@ -33,6 +34,12 @@ namespace LabRat
             }
         }
 
+        public void Set(string str, Color color)
+        {
+            _text = str;
+            Color = color;
+        }
+
         public void Update(GameTime gameTime)
         {
             
@@ -40,7 +47,7 @@ namespace LabRat
 
         public void Draw(SpriteBatch spriteBatch)
         {
-            if(Enabled) spriteBatch.DrawString(_font, _text, Position, Color, 0f, Vector2.Zero, Scale, SpriteEffects.None, 0.85f);
+            if(Enabled) spriteBatch.DrawString(_font, _text, Position, Color, 0f, Vector2.Zero, Scale, SpriteEffects.None, LayerDepth);
         }
     }
 }

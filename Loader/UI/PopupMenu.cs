@@ -7,6 +7,7 @@ namespace LabRat
     {
         public Vector2 Position;
         public bool Enabled;
+        public int RefreshCount = 1;
 
         public bool CanReload = true;
         public bool CanRefresh = true;
@@ -20,12 +21,16 @@ namespace LabRat
         private Image _refreshImage;
         private Image _restartImage;
 
+        private Text _refreshCountText;
+
         private Button _refreshBtn;
         private Button _spaceBtn;
         private Button _restartBtn;
 
         public event EventHandler Refresh;
         public event EventHandler Reload;
+
+        private Vector2 _textOffset = new Vector2(250, 5);
 
         public void LoadContent(ContentManager content)
         {
@@ -40,7 +45,11 @@ namespace LabRat
 
             _refreshImage = new(Position, "forms/refresh_text");
             _refreshImage.LoadContent(content);
-            _refreshImage.LayerDepth = 0f;
+            _refreshImage.LayerDepth = 0.001f;
+
+            _refreshCountText = new(Position, RefreshCount.ToString(), Color.Black, true, 1);
+            _refreshCountText.LoadContent(content);
+            _refreshCountText.LayerDepth = 0.001f;
 
             _spaceBtn = new(null, Position, false, "forms/popup_button", "forms/popup_button");
             _spaceBtn.LoadContent(content);
@@ -54,7 +63,7 @@ namespace LabRat
 
             _restartImage = new(Position, "forms/restart_text");
             _restartImage.LoadContent(content);
-            _restartImage.LayerDepth = 0f;
+            _restartImage.LayerDepth = 0.001f;
             _restartImage.Color = Color.Black;
         }
 
@@ -97,12 +106,21 @@ namespace LabRat
                 _refreshBtn.Reset();
                 _refreshImage.Color = Color.DarkGray;
             }
+            if (RefreshCount > 0)
+            {
+                _refreshCountText.Set(RefreshCount.ToString(), Color.Black);
+            }
+            else
+            {
+                _refreshCountText.Set(RefreshCount.ToString(), Color.DarkGray);
+            }
 
             _restartBtn.Update(gameTime);
             var buttonsPos = new Vector2(Position.X, Position.Y + _popupTop.Height);
             var offset = new Vector2(0, _popupBtn.Height);
             _refreshBtn.Position = buttonsPos;
             _refreshImage.Position = buttonsPos;
+            _refreshCountText.Position = buttonsPos + _textOffset;
 
             _spaceBtn.Position = _refreshBtn.Position + offset;
             _restartBtn.Position = _spaceBtn.Position + offset;
@@ -117,13 +135,14 @@ namespace LabRat
                 return;
             }
             if (!Enabled) return;
-            spriteBatch.Draw(_popupTop, Position, null, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
+            spriteBatch.Draw(_popupTop, Position, null, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0.001f);
             _refreshBtn.Draw(spriteBatch);
             _refreshImage.Draw(spriteBatch);
             _spaceBtn.Draw(spriteBatch);
             _restartBtn.Draw(spriteBatch);
             _restartImage.Draw(spriteBatch);
-            spriteBatch.Draw(_popupBottom, new Vector2(Position.X, Position.Y + _popupTop.Height + _popupBtn.Height * 3), null, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
+            _refreshCountText.Draw(spriteBatch);
+            spriteBatch.Draw(_popupBottom, new Vector2(Position.X, Position.Y + _popupTop.Height + _popupBtn.Height * 3), null, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0.001f);
         }
     }
 }

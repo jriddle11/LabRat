@@ -13,7 +13,7 @@ namespace LabRat
         private LevelDesigner _handler = new();
 
         private string _rootDir;
-        private Action _backToMenu;
+        private Action<bool> _backToMenu;
         private Action _save;
 
         private VideoPlayer _videoPlayer = new();
@@ -25,7 +25,7 @@ namespace LabRat
         private Texture2D _currentVideoFrame;
 
         private int _maxLevels = 3;
-        public LevelControl(int maxLevels, Action backToMenu, Action saveGame)
+        public LevelControl(int maxLevels, Action<bool> backToMenu, Action saveGame)
         {
             Tilemap = new("tileload.txt");
             _maxLevels = maxLevels;
@@ -36,7 +36,15 @@ namespace LabRat
 
         private void HandleExit()
         {
-            if(Level < _maxLevels)
+            if (InputManager.Recording) InputManager.StopRecording();
+            Context.Player.Frozen = true;
+            Context.Camera.Cover.SetNextAction(LeaveLevel);
+            Context.Camera.Cover.FadeIn();
+        }
+
+        private void LeaveLevel()
+        {
+            if (Level < _maxLevels)
             {
                 Level += 1;
                 _save?.Invoke();
@@ -44,7 +52,7 @@ namespace LabRat
             }
             else
             {
-                _backToMenu?.Invoke();
+                _backToMenu?.Invoke(true);
             }
         }
 
@@ -58,28 +66,27 @@ namespace LabRat
             _video = content.Load<Video>("lab");
             _bgtexture = content.Load<Texture2D>("tiles_bg");
             _border = content.Load<Texture2D>("border");
-            Debug.WriteLine(_video.Duration);
-            Debug.WriteLine(_video.Width);
             _playing = true;
         }
 
         public void LoadLevel(int level)
         {
+            Context.Camera.Cover.FadeOut();
             Level = level;
             Tilemap.LoadMap("levels/level" + level + ".txt", _rootDir);
             _handler.SetupFor(level);
-            if(InputManager.Recording)InputManager.StopRecording();
             InputManager.StartRecording();
             _exit.UpdatePosition(Tilemap.EndPosition);
             Context.Player.UpdateStartPosition(Tilemap.StartPosition);
             _exit.Exited = false;
+            Context.Player.Frozen = false;
         }
 
         public void Update(GameTime gameTime)
         {
-            if (InputManager.PressedEscape)
+            if (InputManager.PressedEscape && !Context.Camera.Cover.FadedIn)
             {
-                _backToMenu?.Invoke();
+                _backToMenu?.Invoke(false);
             }
             if (_playing)
             {

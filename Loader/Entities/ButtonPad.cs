@@ -18,6 +18,7 @@ namespace LabRat
         private BoundingRectangle _collider;
         private List<IActivatable> _activatables = new();
         private bool _enabled = false;
+        private bool _previousState = false;
         public bool Enabled { get => _enabled; set => _enabled = value; }
 
         private void UpdateCollider()
@@ -44,7 +45,10 @@ namespace LabRat
         {
             if (!_enabled) return;
             UpdateCollider();
+            _previousState = _isPressed;
             _isPressed = _collider.CollidesWith(Context.Player.FloorCollider) || Context.Player.CollidesWithClones(_collider);
+            if (!_previousState && _isPressed) SoundManager.PlayButtonDown();
+            if (_previousState && !_isPressed) SoundManager.PlayButtonUp();
             foreach (var activatable in _activatables) activatable.IsActivated = _isPressed;
             foreach (var activatable in _activatables) activatable.Update(gameTime);
         }

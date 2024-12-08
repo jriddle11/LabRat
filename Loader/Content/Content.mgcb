@@ -85,6 +85,18 @@
 /processorParam:TextureFormat=Color
 /build:cheese.png
 
+#begin cover.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:cover.png
+
 #begin forms/menu_bg_big.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -337,6 +349,18 @@
 /processorParam:TextureFormat=Color
 /build:forms/sign_move.png
 
+#begin forms/sign_patience.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:forms/sign_patience.png
+
 #begin forms/sign_ride.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -360,6 +384,30 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:forms/sign_time.png
+
+#begin forms/slider_back.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:forms/slider_back.png
+
+#begin forms/slider_handle.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:forms/slider_handle.png
 
 #begin lab.mp4
 /importer:H264Importer
@@ -413,6 +461,18 @@
 
 #begin levels/level4.txt
 /copy:levels/level4.txt
+
+#begin levels/level5.txt
+/copy:levels/level5.txt
+
+#begin levels/level6.txt
+/copy:levels/level6.txt
+
+#begin levels/level7.txt
+/copy:levels/level7.txt
+
+#begin levels/level8.txt
+/copy:levels/level8.txt
 
 #begin player/player_idle.png
 /importer:TextureImporter
@@ -471,6 +531,36 @@
 /processorParam:PremultiplyAlpha=True
 /processorParam:TextureFormat=Compressed
 /build:serif.spritefont
+
+#begin sounds/button_down.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:sounds/button_down.wav
+
+#begin sounds/button_up.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:sounds/button_up.wav
+
+#begin sounds/jump.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:sounds/jump.wav
+
+#begin sounds/mouse_click_down.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:sounds/mouse_click_down.wav
+
+#begin sounds/mouse_click_up.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:sounds/mouse_click_up.wav
 
 #begin sounds/mouse_click.wav
 /importer:WavImporter

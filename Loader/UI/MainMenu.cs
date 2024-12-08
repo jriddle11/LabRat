@@ -7,14 +7,15 @@ namespace LabRat
     {
         public int LevelSelected = 0;
         public Vector2 Position;
-        private Vector2 _creditPos => Position - new Vector2(550, 100);
-        private Vector2 _optionsPos => Position - new Vector2(-550, -200);
+        private Vector2 _aboutPos => Position - new Vector2(550, 100);
+        private Vector2 _creditsPos => Position - new Vector2(-550, -200);
         private Vector2 _levelsPos => Position - new Vector2(100, 0);
 
         private Form _mainForm;
-        private Form _optionsForm;
         private Form _creditsForm;
+        private Form _aboutForm;
         private Form _levelsForm;
+        private Form _winForm;
 
         private Color _white = Color.White;
         private Color _black = new Color(60,60,60);
@@ -27,6 +28,9 @@ namespace LabRat
 
         private bool _levelsOpen;
 
+        private ContentManager _content;
+
+
         public MainMenu(Vector2 pos, int levels, int highestLevel, Action quit, Action startLevel)
         {
             Position = pos;
@@ -36,39 +40,58 @@ namespace LabRat
             _startLevel = startLevel;
         }
 
-        public void UpdateLevels(int level)
-        {
-            _highestLevel = level;
-            UpdateLevelButtons();
-        }
-
         public void LoadContent(ContentManager content)
         {
+            _content ??= content;
             LoadMainForm(content);
-            LoadCreditForm(content);
-            LoadOptionsForm(content);
+            LoadAboutForm(content);
+            LoadCreditsForm(content);
             LoadLevelForm(content);
+            LoadWinForm(content);
             SoundManager.PlaySongMuffled();
+        }
+
+        public void BackToMenu(int level)
+        {
+            _highestLevel = level;
+            LoadContent(_content);
+        }
+
+        private void LoadWinForm(ContentManager content)
+        {
+            _winForm = new(Position, FormType.Standard, "Winner");
+            _winForm.LayerDepth = 0.9f;
+            _winForm.AddText(new Text(Position + new Vector2(_winForm.Width / 2, 110), "YOU   WIN", _black, true));
+            _winForm.LoadContent(content);
+            _winForm.Enabled = false;
         }
 
         private void LoadMainForm(ContentManager content)
         {
             _mainForm = new(Position, FormType.Standard, "Ultimate   Mouse");
             _mainForm.AddButton(new Button(HandleStartPress, Position + new Vector2(_mainForm.Width / 2, 100), true, "forms/menu_btn", "forms/menu_btn_press", "forms/menu_btn_hover"));
-            _mainForm.AddButton(new Button(HandleOptionsPress, Position + new Vector2(_mainForm.Width / 2, 200), true, "forms/menu_btn", "forms/menu_btn_press", "forms/menu_btn_hover"));
+            _mainForm.AddButton(new Button(HandleAboutPress, Position + new Vector2(_mainForm.Width / 2, 200), true, "forms/menu_btn", "forms/menu_btn_press", "forms/menu_btn_hover"));
             _mainForm.AddButton(new Button(HandleCreditsPress, Position + new Vector2(_mainForm.Width / 2, 300), true, "forms/menu_btn", "forms/menu_btn_press", "forms/menu_btn_hover"));
             _mainForm.AddText(new Text(Position + new Vector2(_mainForm.Width / 2, 110), "START", _black, true));
-            _mainForm.AddText(new Text(Position + new Vector2(_mainForm.Width / 2, 210), "OPTIONS", _black, true));
+            _mainForm.AddText(new Text(Position + new Vector2(_mainForm.Width / 2, 210), "ABOUT", _black, true));
             _mainForm.AddText(new Text(Position + new Vector2(_mainForm.Width / 2, 310), "CREDITS", _black, true));
             _mainForm.LoadContent(content);
         }
 
-        private void LoadOptionsForm(ContentManager content)
+        private void LoadCreditsForm(ContentManager content)
         {
-            _optionsForm = new(_optionsPos, FormType.Standard, "Options");
-            _optionsForm.AddText(new Text(_optionsPos + new Vector2(_optionsForm.Width / 2, 210), "Under  Construction", _black, true));
-            _optionsForm.LoadContent(content);
-            _optionsForm.Enabled = false;
+            _creditsForm = new(_creditsPos, FormType.Standard, "Credits");
+            _creditsForm.AddText(new Text(_creditsPos + new Vector2(20, 60), "'Zipper slider metalic' - vmmaniac", _black, false, .75f));
+            _creditsForm.AddText(new Text(_creditsPos + new Vector2(20, 90), "'Mouse' - charliecatling", _black, false, .75f));
+            _creditsForm.AddText(new Text(_creditsPos + new Vector2(20, 120), "'Square buttons cartoon menu' - chardingtont", _black, false, .75f));
+            _creditsForm.AddText(new Text(_creditsPos + new Vector2(20, 150), "'Laboratory assets' - Anouk Paardekam", _black, false, .75f));
+            _creditsForm.AddText(new Text(_creditsPos + new Vector2(20, 180), "'Chibi Base Mesh' - DuNguyn", _black, false, .75f));
+            _creditsForm.AddText(new Text(_creditsPos + new Vector2(20, 210), "'Mouse Click' - Jurij", _black, false, .75f));
+            _creditsForm.AddText(new Text(_creditsPos + new Vector2(20, 240), "'Upbeat Mission' - Cyberwave-Orchestra", _black, false, .75f));
+            _creditsForm.AddText(new Text(_creditsPos + new Vector2(20, 270), "'Toggle Button On' - Milan Wulf", _black, false, .75f));
+            _creditsForm.AddText(new Text(_creditsPos + new Vector2(20, 300), "'Jump Sound Effect' - freesound_community", _black, false, .75f));
+            _creditsForm.LoadContent(content);
+            _creditsForm.Enabled = false;
         }
 
         private void LoadLevelForm(ContentManager content)
@@ -81,7 +104,7 @@ namespace LabRat
                 var pos = _levelsPos + new Vector2(54 + ((i * 55) % 550), 70 + 70 * ((i / 10)));
                 var button = new Button(() => HandleLevelPress(level + 1), pos, true, "forms/menu_level_btn", "forms/menu_level_btn_press", "forms/menu_level_btn_hover");
                 var text = new Text(pos - (level > 8 ? new Vector2(12, 0) : new Vector2(5, 0)), "" + (level + 1), _black, false);
-                if (level > _highestLevel + 1)
+                if (level > _highestLevel)
                 {
                     button.Enabled = false;
                     text.Enabled = false;
@@ -96,31 +119,14 @@ namespace LabRat
             _levelsForm.Enabled = false;
         }
 
-        private void UpdateLevelButtons()
+        private void LoadAboutForm(ContentManager content)
         {
-            for (int i = 0; i < _levelsForm.Buttons.Count; i++)
-            {
-                if (i - 1 > _highestLevel)
-                {
-                    _levelsForm.Buttons[i].Enabled = false;
-                    _levelsForm.Texts[i].Enabled = false;
-                }
-                else
-                {
-                    _levelsForm.Buttons[i].Enabled = true;
-                    _levelsForm.Texts[i].Enabled = true;
-                }
-            }
-        }
+            _aboutForm = new(_aboutPos, FormType.Standard, "About");
+            _aboutForm.AddText(new Text(_aboutPos + new Vector2(_aboutForm.Width / 2, 110), "Created   by", _black, true));
+            _aboutForm.AddText(new Text(_aboutPos + new Vector2(_aboutForm.Width / 2, 210), "Josh   Riddle", _black, true));
 
-        private void LoadCreditForm(ContentManager content)
-        {
-            _creditsForm = new(_creditPos, FormType.Standard, "Credits");
-            _creditsForm.AddText(new Text(_creditPos + new Vector2(_creditsForm.Width / 2, 110), "Created   by", _black, true));
-            _creditsForm.AddText(new Text(_creditPos + new Vector2(_creditsForm.Width / 2, 210), "Josh   Riddle", _black, true));
-
-            _creditsForm.LoadContent(content);
-            _creditsForm.Enabled = false;
+            _aboutForm.LoadContent(content);
+            _aboutForm.Enabled = false;
         }
 
         private void HandleStartPress()
@@ -140,16 +146,12 @@ namespace LabRat
 
         public void Reset()
         {
+            _winForm.Enabled = false;
             _mainForm.Enabled = true;
             _levelsForm.Enabled = false;
-            _optionsForm.Enabled = false;
             _creditsForm.Enabled = false;
+            _aboutForm.Enabled = false;
             _levelsOpen = false;
-        }
-
-        private void HandleOptionsPress()
-        {
-            _optionsForm.Enabled = true;
         }
 
         private void HandleCreditsPress()
@@ -157,12 +159,23 @@ namespace LabRat
             _creditsForm.Enabled = true;
         }
 
+        private void HandleAboutPress()
+        {
+            _aboutForm.Enabled = true;
+        }
+
+        public void Winner()
+        {
+            _winForm.Enabled = true;
+        }
+
         public void Update(GameTime gameTime)
         {
             _levelsForm.Update(gameTime);
-            _optionsForm.Update(gameTime);
             _creditsForm.Update(gameTime);
-            _mainForm.Update(gameTime);
+            _aboutForm.Update(gameTime);
+            if(!_winForm.Enabled)_mainForm.Update(gameTime);
+            _winForm?.Update(gameTime);
             if(!_levelsForm.Enabled && _levelsOpen)
             {
                 _levelsOpen = false;
@@ -175,8 +188,9 @@ namespace LabRat
         {
             _levelsForm.Draw(spriteBatch);
             _mainForm.Draw(spriteBatch);
-            _optionsForm.Draw(spriteBatch);
             _creditsForm.Draw(spriteBatch);
+            _aboutForm.Draw(spriteBatch);
+            _winForm.Draw(spriteBatch);
         }
     }
 }
